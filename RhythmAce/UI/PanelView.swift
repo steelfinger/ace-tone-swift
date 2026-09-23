@@ -15,19 +15,23 @@ struct PanelView: View {
     var body: some View {
         GeometryReader { geo in
             let w = geo.size.width
+            let h = geo.size.height + geo.safeAreaInsets.bottom   // full screen height
             // Keep 40pt clearance without a home indicator; clear it when present.
             let bottomClearance = max(40, geo.safeAreaInsets.bottom + 8)
+            let grid = GridMetrics(width: w, height: h)
+            // RN: rows have marginBottom '3%' of the column's inner width
+            let rowGap = 0.03 * ((w - 60) / 2 - 16)
 
             VStack(spacing: 0) {
                 header(w)
                     .padding(.top, w * 0.36)
                     .padding(.bottom, w * 0.02)
 
-                patternGrid(w)
+                patternGrid(w, grid)
                     .padding(.top, w * 0.03)
 
                 HStack(alignment: .top, spacing: 0) {
-                    cancelColumn
+                    cancelColumn(rowGap: rowGap)
                     dialColumn
                 }
                 .padding(.top, w * 0.02)
@@ -70,11 +74,30 @@ struct PanelView: View {
 
     // MARK: Rhythm keys
 
-    private func patternGrid(_ w: CGFloat) -> some View {
+    /// Reproduces how Yoga resolved the RN layout's `height: '4%'` spacer
+    /// between the rows (verified against RN screenshots on 3 screen sizes):
+    /// the grid section is first sized with 4% of the height available
+    /// below the header, then the spacer re-resolves to 4% of the grid
+    /// section's own height. The remainder ends up as space below row 2.
+    struct GridMetrics {
+        let spacer: CGFloat
+        let below: CGFloat
+
+        init(width w: CGFloat, height h: CGFloat) {
+            let rowHeight = w * 0.95 / 8 * 212 / 96
+            let firstPass = 0.04 * (h - 0.36 * w)
+            let section = 2 * (0.05 * w + rowHeight) + firstPass
+            spacer = 0.04 * section
+            below = max(0, firstPass - spacer)
+        }
+    }
+
+    private func patternGrid(_ w: CGFloat, _ m: GridMetrics) -> some View {
         VStack(spacing: 0) {
             patternRow(PATTERNS[0..<8], w)
-            Color.clear.frame(height: w * 0.04)
+            Color.clear.frame(height: m.spacer)
             patternRow(PATTERNS[8..<16], w)
+            Color.clear.frame(height: m.below)
         }
     }
 
@@ -92,8 +115,8 @@ struct PanelView: View {
 
     // MARK: Cancel + Start
 
-    private var cancelColumn: some View {
-        VStack(alignment: .leading, spacing: 5) {
+    private func cancelColumn(rowGap: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: rowGap) {
             ForEach(MUTE_VOICES, id: \.id) { v in
                 LabeledRoundButton(label: v.label, pressed: seq.mutes.contains(v.id)) {
                     seq.toggleMute(v.id)
@@ -103,7 +126,7 @@ struct PanelView: View {
             LabeledRoundButton(label: "START", pressed: seq.running) {
                 seq.running.toggle()
             }
-            .padding(.bottom, 16)
+            .padding(.bottom, 16 + rowGap)
         }
         .padding(.top, 20)
         .padding(.leading, 16)

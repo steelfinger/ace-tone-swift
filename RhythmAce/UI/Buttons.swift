@@ -34,7 +34,7 @@ struct RectangularButton: View {
             .foregroundStyle(Color.rule)
             .fixedSize()
             .frame(width: 60)
-            .alignmentGuide(.top) { $0[.bottom] + 6 }
+            .alignmentGuide(.top) { $0[.bottom] + 8 }  // RN: marginBottom 6; +2 for line-box offset
         }
         .frame(maxWidth: .infinity)
         .accessibilityLabel(pat.name)

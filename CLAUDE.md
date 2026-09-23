@@ -41,3 +41,7 @@ open RhythmAce.xcodeproj
 ```
 
 Re-run `xcodegen generate` after adding/removing files.
+
+## Layout verification
+
+`scripts/screenshots.sh [device names…]` builds once, screenshots the app on several simulator sizes and writes `screenshots/contact-sheet.png` (gitignored). Set `REF_APP=path/to/RN.app` to also shoot the RN build on each device, next to ours. The RN app is the layout reference: `PanelView` reproduces its percentage-based Yoga layout, including the quirks documented in `GridMetrics`.
