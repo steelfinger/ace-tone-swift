@@ -1,0 +1,38 @@
+name: RhythmAce
+options:
+  bundleIdPrefix: fi.steelfinger
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "1.0.1"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  RhythmAce:
+    type: application
+    platform: iOS
+    sources:
+      - RhythmAce
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: fi.steelfinger.rhythmace.native
+        PRODUCT_NAME: RhythmAce
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Rhythm Ace
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIRequiresFullScreen: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UIUserInterfaceStyle: Light
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+    info:
+      path: RhythmAce/Info.plist
+      properties:
+        UIAppFonts:
+          - Tinos_700Bold_Italic.ttf
+          - StardosStencil_700Bold.ttf
+          - BebasNeue_400Regular.ttf
+          - Oswald_700Bold.ttf
