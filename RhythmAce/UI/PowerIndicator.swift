@@ -9,7 +9,7 @@ struct PowerIndicator: View {
     var body: some View {
         TimelineView(.animation(paused: !running)) { _ in
             let lit = running && control.lampLit.load(ordering: .relaxed)
-            Image(lit ? "red-light-on" : "red-light-off")
+            Image(lit ? .redLightOn : .redLightOff)
                 .resizable()
                 .scaledToFit()
         }

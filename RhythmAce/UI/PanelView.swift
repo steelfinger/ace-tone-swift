@@ -1,6 +1,6 @@
 import SwiftUI
 
-private let MUTE_VOICES: [(id: VoiceID, label: String)] = [
+let MUTE_VOICES: [(id: VoiceID, label: String)] = [
     (.cy, "CYMBAL"),
     (.cl, "CLAVES"),
     (.cb, "COW BELL"),
@@ -11,8 +11,31 @@ private let MUTE_VOICES: [(id: VoiceID, label: String)] = [
 /// paddings/margins resolve against the screen width.
 struct PanelView: View {
     @Environment(Sequencer.self) private var seq
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
+        // The panel is a fixed-proportion graphic, so it keeps its fixed-size
+        // fonts. Large text switches to a plain, scrollable layout instead.
+        Group {
+            if typeSize >= .xxLarge {
+                LargeTextPanelView()
+            } else {
+                classicPanel
+            }
+        }
+        .alert("Can't start audio", isPresented: audioErrorBinding, presenting: seq.audioError) { _ in
+            Button("OK", role: .cancel) {}
+        } message: { message in
+            Text(message)
+        }
+    }
+
+    private var audioErrorBinding: Binding<Bool> {
+        Binding(get: { seq.audioError != nil },
+                set: { if !$0 { seq.dismissAudioError() } })
+    }
+
+    private var classicPanel: some View {
         GeometryReader { geo in
             let w = geo.size.width
             let h = geo.size.height + geo.safeAreaInsets.bottom   // full screen height
@@ -44,7 +67,7 @@ struct PanelView: View {
             .ignoresSafeArea(edges: .bottom)
         }
         .background {
-            Image("background")
+            Image(.background)
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
@@ -124,7 +147,7 @@ struct PanelView: View {
             }
             Spacer(minLength: 0)
             LabeledRoundButton(label: "START", pressed: seq.running) {
-                seq.running.toggle()
+                seq.toggleRunning()
             }
             .padding(.bottom, 16 + rowGap)
         }
@@ -149,24 +172,26 @@ struct PanelView: View {
             // TEMPO
             VStack(spacing: 0) {
                 knobLabel("TEMPO")
-                knob(size: 82, shadow: 80, image: "black-knob",
-                     range: 40...240, value: seq.bpm, onChange: seq.setBpm)
+                knob(size: 82, shadow: 80, image: .blackKnob,
+                     range: Sequencer.bpmRange, value: seq.bpm, onChange: seq.setBpm,
+                     label: "Tempo", valueText: { "\(Int($0.rounded())) beats per minute" })
                     .padding(.top, 20)
             }
             .background(alignment: .top) {
-                scale("tempo-scale", size: 136).offset(y: 5)
+                scale(.tempoScale, size: 136).offset(y: 5)
             }
             .padding(.bottom, 10)
 
             // VOLUME
             VStack(spacing: 0) {
                 knobLabel("VOLUME")
-                knob(size: 90, shadow: 90, image: "silver-knob",
-                     range: 0...1, value: seq.volume, onChange: { seq.volume = $0 })
+                knob(size: 90, shadow: 90, image: .silverKnob,
+                     range: 0...1, value: seq.volume, onChange: seq.setVolume,
+                     label: "Volume", valueText: { "\(Int(($0 * 100).rounded())) percent" })
                     .padding(.top, 10)
             }
             .background(alignment: .top) {
-                scale("volume-scale", size: 112).offset(y: 19)
+                scale(.volumeScale, size: 112).offset(y: 19)
             }
             .overlay(alignment: .topTrailing) {
                 PowerIndicator(control: seq.control, running: seq.running)
@@ -193,7 +218,7 @@ struct PanelView: View {
             .padding(.bottom, 4)
     }
 
-    private func scale(_ name: String, size: CGFloat) -> some View {
+    private func scale(_ name: ImageResource, size: CGFloat) -> some View {
         Image(name)
             .resizable()
             .scaledToFit()
@@ -201,13 +226,16 @@ struct PanelView: View {
             .allowsHitTesting(false)
     }
 
-    private func knob(size: CGFloat, shadow: CGFloat, image: String,
+    private func knob(size: CGFloat, shadow: CGFloat, image: ImageResource,
                       range: ClosedRange<Double>, value: Double,
-                      onChange: @escaping (Double) -> Void) -> some View {
-        KnobView(range: range, value: value, onChange: onChange, image: image)
+                      onChange: @escaping (Double) -> Void,
+                      label: LocalizedStringKey,
+                      valueText: @escaping (Double) -> String) -> some View {
+        KnobView(range: range, value: value, onChange: onChange, image: image,
+                 label: label, valueText: valueText)
             .frame(width: size, height: size)
             .background(alignment: .top) {
-                Image("round-shadow")
+                Image(.roundShadow)
                     .resizable()
                     .frame(width: shadow, height: shadow)
                     .opacity(0.7)

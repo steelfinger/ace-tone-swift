@@ -6,7 +6,9 @@ struct KnobView: View {
     let range: ClosedRange<Double>
     let value: Double
     let onChange: (Double) -> Void
-    let image: String
+    let image: ImageResource
+    let label: LocalizedStringKey
+    let valueText: (Double) -> String
 
     @State private var start: (angle: Double, value: Double)?
 
@@ -41,7 +43,8 @@ struct KnobView: View {
                 )
         }
         .accessibilityElement()
-        .accessibilityValue(Text("\(Int(value.rounded()))"))
+        .accessibilityLabel(label)
+        .accessibilityValue(valueText(value))
         .accessibilityAdjustableAction { dir in
             let stepSize = span / 20
             let next = dir == .increment ? value + stepSize : value - stepSize

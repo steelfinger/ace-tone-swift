@@ -9,12 +9,12 @@ struct RectangularButton: View {
     var body: some View {
         let parts = pat.label.split(separator: " ", maxSplits: 1).map(String.init)
         Button(action: onPress) {
-            Image(selected ? "rect-button-pressed" : "rect-button")
+            Image(selected ? .rectButtonPressed : .rectButton)
                 .resizable()
                 .aspectRatio(96 / 212, contentMode: .fit)
                 .background(alignment: .bottom) {
                     if !selected {
-                        Image("rect-shadow")
+                        Image(.rectShadow)
                             .resizable()
                             .frame(height: 64)
                             .offset(y: 15)
@@ -47,13 +47,13 @@ struct RoundButton: View {
     let pressed: Bool
 
     var body: some View {
-        Image(pressed ? "round-button-pressed" : "round-button")
+        Image(pressed ? .roundButtonPressed : .roundButton)
             .resizable()
             .scaledToFit()
             .frame(width: 28, height: 28)
             .background(alignment: .topLeading) {
                 if !pressed {
-                    Image("round-shadow")
+                    Image(.roundShadow)
                         .resizable()
                         .frame(width: 32, height: 32)
                         .opacity(0.4)
@@ -95,7 +95,11 @@ struct LabeledRoundButton: View {
                 RoundButton(pressed: pressed)
             }
             .frame(maxWidth: .infinity, minHeight: 40, maxHeight: 40, alignment: .topLeading)
+            // 44pt hit target without changing the 40pt layout: the row gap
+            // is wider than the 2pt that spills over on each side.
+            .padding(.vertical, 2)
             .contentShape(Rectangle())
+            .padding(.vertical, -2)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label.capitalized)
