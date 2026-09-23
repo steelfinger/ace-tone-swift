@@ -17,7 +17,7 @@ targets:
       - RhythmAce
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: fi.steelfinger.rhythmace.native
+        PRODUCT_BUNDLE_IDENTIFIER: fi.steelfinger.rhythmace
         PRODUCT_NAME: RhythmAce
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
