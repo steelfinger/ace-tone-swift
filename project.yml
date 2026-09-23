@@ -10,6 +10,8 @@ settings:
     MARKETING_VERSION: "2.0.0"
     CURRENT_PROJECT_VERSION: "1"
     ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: YES
+    DEVELOPMENT_TEAM: LNX3277TP2
+    CODE_SIGN_STYLE: Automatic
 targets:
   RhythmAce:
     type: application

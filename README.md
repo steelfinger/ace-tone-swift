@@ -56,6 +56,29 @@ The RN app is the layout reference. `scripts/screenshots.sh` builds once, screen
 scripts/screenshots.sh "iPhone 17 Pro" "iPhone SE (3rd generation)"
 ```
 
+## Deployment (Xcode Cloud)
+
+Builds run on [Xcode Cloud](https://developer.apple.com/xcode-cloud/). In the repo, [`ci_scripts/ci_post_clone.sh`](ci_scripts/ci_post_clone.sh) installs XcodeGen, generates the project and stamps `CI_BUILD_NUMBER` into `CURRENT_PROJECT_VERSION` (App Store Connect rejects duplicate build numbers). The workflows live in Apple's UI, not in the repo.
+
+### One-time setup
+
+1. Make sure the app exists in [App Store Connect](https://appstoreconnect.apple.com) › Apps with bundle ID `fi.steelfinger.rhythmace`.
+2. `xcodegen generate && open RhythmAce.xcodeproj`
+3. Xcode › Product › Xcode Cloud › Create Workflow…
+4. Pick the `RhythmAce` app, click **Grant Access** for GitHub and authorise `steelfinger/ace-tone-swift`.
+5. Edit the workflow that opens:
+   - **Name:** `Release`
+   - **Start Conditions:** delete the default *Branch Changes*, add **Tag Changes** › tag name starts with `v`
+   - **Actions:** delete the default, add **Archive** › Platform iOS, Scheme `RhythmAce`, Distribution *App Store Connect*
+   - **Post-Actions:** add **TestFlight (Internal Testing)**, pick your internal group
+6. Save. Then create a second workflow (Report navigator › Cloud tab › **+**): name `CI`, start on **Branch Changes** for `main`, action **Test** › scheme `RhythmAce`, an iPhone simulator.
+
+### Each release
+
+1. Bump `MARKETING_VERSION` in `project.yml`, commit, push.
+2. `git tag v2.0.0 && git push origin v2.0.0`
+3. Wait for the build in Xcode's Report navigator or App Store Connect › TestFlight, then run the checklist below.
+
 ## TestFlight checklist
 
 Audio session behaviour can't be fully covered by unit tests. Before a release, check on a device:
