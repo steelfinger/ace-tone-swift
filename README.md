@@ -56,6 +56,20 @@ The RN app is the layout reference. `scripts/screenshots.sh` builds once, screen
 scripts/screenshots.sh "iPhone 17 Pro" "iPhone SE (3rd generation)"
 ```
 
+## TestFlight checklist
+
+Audio session behaviour can't be fully covered by unit tests. Before a release, check on a device:
+
+- Music from another app keeps playing until START is pressed, and resumes after STOP
+- Bluetooth headphones: connect, disconnect mid-play (playback stops, no blast from the speaker)
+- Wired headphones: unplug mid-play (playback stops)
+- Phone call / Siri interruption while playing: START releases, resumes only if the system says so
+- Silent switch: audio still plays
+- App switch and lock screen while playing: the beat continues (`UIBackgroundModes: audio`)
+- STOP, then background the app: nothing keeps running, other apps' audio is unaffected
+- Low Power Mode and an older device: no dropouts at 240 BPM with all voices active
+- Larger Text (Settings › Accessibility): the plain layout appears from XXL up
+
 ## Pattern accuracy
 
 The 16 preset grids are transcribed by ear from FR-1 demos. The original pattern ROM was never published — treat them as a starting point and refine against reference recordings.

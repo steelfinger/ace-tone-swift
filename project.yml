@@ -35,6 +35,8 @@ targets:
     info:
       path: RhythmAce/Info.plist
       properties:
+        UIBackgroundModes:
+          - audio
         UIAppFonts:
           - Tinos_700Bold_Italic.ttf
           - StardosStencil_700Bold.ttf

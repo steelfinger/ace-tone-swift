@@ -25,5 +25,9 @@
 		<string>BebasNeue_400Regular.ttf</string>
 		<string>Oswald_700Bold.ttf</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 </dict>
 </plist>
